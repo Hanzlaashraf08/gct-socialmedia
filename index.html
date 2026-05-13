@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Grace Chemicals — Social Media Planner</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+/* ── RESET & TOKENS ── */
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --brand:#1a472a;--brand2:#2d6a4f;--accent:#f4a261;--accent2:#e76f51;
+  --bg:#f8f7f4;--sur:#ffffff;--sur2:#f1efe9;--bor:#e2ddd6;--bor2:#ccc7be;
+  --tx:#1a1916;--tx2:#5a574f;--tx3:#9a968e;
+  --green-bg:#d8f3dc;--green-tx:#1b4332;--green-bor:#95d5b2;
+  --red-bg:#ffe0d6;--red-tx:#7f1d1d;--red-bor:#ffb4a2;
+  --r:12px;--rs:8px;--r-pill:20px;
+  --shadow:0 1px 3px rgba(0,0,0,.06);
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;font-size:15px}
+button{font-family:'DM Sans',sans-serif;cursor:pointer}
+textarea{font-family:'DM Sans',sans-serif}
+.syne{font-family:'Syne',sans-serif}
+
+/* ── CONFIG BANNER ── */
+#config-banner{background:#fffbea;border-bottom:1px solid #f4d88a;padding:12px 16px;display:flex;align-items:flex-start;gap:10px;font-size:13px;color:#78350f}
+#config-banner.hidden{display:none}
+#config-banner strong{font-weight:500}
+#config-banner input{flex:1;padding:6px 10px;border:1px solid #f4d88a;border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;background:#fff;color:#1a1916;min-width:0}
+#config-banner button{padding:6px 14px;background:#1a472a;color:#fff;border:none;border-radius:6px;font-size:12px;white-space:nowrap}
+.cfg-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;width:100%}
+
+/* ── HEADER ── */
+.hdr{background:var(--brand);color:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;position:sticky;top:0;z-index:50}
+.hdr-left{display:flex;align-items:center;gap:10px}
+.logo{width:36px;height:36px;background:var(--accent);border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--brand);flex-shrink:0}
+.hdr h1{font-family:'Syne',sans-serif;font-size:15px;font-weight:600;line-height:1.2}
+.hdr h1 span{color:var(--accent)}
+.hdr-sub{font-size:11px;opacity:.55;margin-top:1px}
+.week-nav{display:flex;align-items:center;gap:6px}
+.week-nav button{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:7px;padding:6px 11px;font-size:12px;transition:background .15s}
+.week-nav button:hover{background:rgba(255,255,255,.22)}
+.week-nav .tbtn{background:var(--accent);color:var(--brand);font-weight:500;border-color:transparent}
+.week-nav .tbtn:hover{background:#f7b97a}
+.wlabel{font-size:12px;color:rgba(255,255,255,.7);min-width:140px;text-align:center;font-family:'Syne',sans-serif}
+
+/* ── MAIN ── */
+.main{padding:16px;max-width:960px;margin:0 auto}
+
+/* ── STATS ── */
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+.sc{background:var(--sur);border:1px solid var(--bor);border-radius:var(--r);padding:12px 14px;position:relative;overflow:hidden}
+.sc::after{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.sc.s-done::after{background:var(--brand2)}
+.sc.s-miss::after{background:var(--accent2)}
+.sc.s-pend::after{background:var(--accent)}
+.sc.s-rate::after{background:#457b9d}
+.sc-label{font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.sc-val{font-family:'Syne',sans-serif;font-size:26px;font-weight:700;line-height:1}
+.sc.s-done .sc-val{color:var(--green-tx)}
+.sc.s-miss .sc-val{color:#9b2226}
+.sc.s-pend .sc-val{color:#92400e}
+.sc.s-rate .sc-val{color:#1d3557}
+.sc-bar{width:100%;height:3px;background:var(--sur2);border-radius:2px;margin-top:8px;overflow:hidden}
+.sc-bar-fill{height:100%;border-radius:2px;transition:width .4s ease}
+.sc.s-done .sc-bar-fill{background:var(--brand2)}
+.sc.s-miss .sc-bar-fill{background:var(--accent2)}
+
+/* ── SYNC STATUS ── */
+.sync-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;font-size:12px;color:var(--tx3)}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--tx3);flex-shrink:0}
+.sync-dot.ok{background:#2d6a4f}
+.sync-dot.err{background:#e76f51}
+.sync-dot.loading{background:var(--accent);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ── PLATFORM FILTER ── */
+.pfilt{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.ptab{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:var(--r-pill);border:1px solid var(--bor);background:var(--sur);font-size:12px;color:var(--tx2);transition:all .15s}
+.ptab:hover{border-color:var(--brand);color:var(--brand)}
+.ptab.active{background:var(--brand);color:#fff;border-color:var(--brand)}
+.ptab .pd{width:7px;height:7px;border-radius:50%}
+
+/* ── DAY STRIP ── */
+.day-strip-wrap{margin-bottom:16px}
+.sec-label{font-family:'Syne',sans-serif;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);margin-bottom:10px}
+.day-strip{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.ds-day{border:1.5px solid var(--bor);border-radius:var(--rs);padding:7px 4px;text-align:center;cursor:pointer;transition:all .15s;background:var(--sur)}
+.ds-day:hover{border-color:var(--brand2)}
+.ds-day.sel{border-color:var(--brand);background:#f0f7f2;box-shadow:0 0 0 3px rgba(26,71,42,.08)}
+.ds-day.today{border-color:var(--brand)}
+.ds-dow{font-size:11px;font-weight:600;color:var(--tx2)}
+.ds-day.today .ds-dow{color:var(--brand)}
+.ds-date{font-size:10px;color:var(--tx3);margin:1px 0 5px}
+.ds-dots{display:flex;flex-direction:column;gap:2px;align-items:center}
+.ds-dot{width:18px;height:4px;border-radius:2px;opacity:.7}
+.ds-dot.done{opacity:.5}
+.ds-dot.missed{opacity:1}
+
+/* ── DETAIL ── */
+.det-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:10px;flex-wrap:wrap}
+.det-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:600}
+.prog-wrap{display:flex;align-items:center;gap:8px}
+.prog-track{width:120px;height:5px;background:var(--bor);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--brand),var(--brand2));border-radius:3px;transition:width .4s}
+.prog-txt{font-size:12px;color:var(--tx2);white-space:nowrap}
+
+/* ── LEGEND ── */
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+.leg{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--tx2)}
+.leg-d{width:8px;height:8px;border-radius:50%}
+
+/* ── CONTENT ITEMS ── */
+.clist{display:flex;flex-direction:column;gap:8px}
+.ci{background:var(--sur);border:1px solid var(--bor);border-radius:var(--r);padding:12px 14px;transition:border-color .15s}
+.ci:hover{border-color:var(--bor2)}
+.ci.done{opacity:.55}
+.ci.missed{border-left:3px solid var(--accent2);border-radius:0 var(--r) var(--r) 0}
+.ci-top{display:flex;align-items:flex-start;gap:12px}
+.ci-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;letter-spacing:.02em}
+.ci-body{flex:1;min-width:0}
+.ci-pname{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
+.ci-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:600;margin-bottom:2px}
+.ci.done .ci-title{text-decoration:line-through}
+.ci-type{font-size:11px;color:var(--tx3);margin-bottom:6px}
+.ci-idea{font-size:12px;color:var(--tx2);background:var(--sur2);border-radius:6px;padding:7px 10px;border-left:2px solid var(--accent)}
+.ci-idea b{color:var(--tx);font-weight:500}
+.ci-actions{display:flex;gap:5px;margin-top:10px;flex-wrap:wrap}
+.ci-actions button{padding:7px 14px;border-radius:var(--rs);border:1px solid var(--bor);font-size:12px;background:var(--sur);color:var(--tx2);transition:all .15s;min-height:36px}
+.btn-done{color:var(--green-tx)!important;border-color:var(--green-bor)!important;background:var(--green-bg)!important}
+.btn-done:hover{background:#c0e8cb!important}
+.btn-miss{color:var(--red-tx)!important;border-color:var(--red-bor)!important;background:var(--red-bg)!important}
+.btn-miss:hover{background:#ffd0c4!important}
+.btn-undo{color:var(--tx3)!important;font-size:11px!important}
+.btn-undo:hover{background:var(--sur2)!important}
+.status-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:var(--r-pill);font-size:11px;font-weight:500;margin-bottom:4px}
+.sb-done{background:var(--green-bg);color:var(--green-tx)}
+.sb-miss{background:var(--red-bg);color:var(--red-tx)}
+.sb-pend{background:var(--sur2);color:var(--tx3)}
+
+/* ── NOTES ── */
+.notes-wrap{margin-top:8px}
+.notes-input{width:100%;padding:7px 10px;border:1px solid var(--bor);border-radius:var(--rs);font-size:12px;background:var(--bg);color:var(--tx);resize:none;transition:border-color .15s;min-height:36px}
+.notes-input:focus{outline:none;border-color:var(--brand)}
+.notes-input::placeholder{color:var(--tx3)}
+
+/* ── USER NAME ── */
+.user-row{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.user-row label{font-size:12px;color:var(--tx2);white-space:nowrap}
+.user-row input{padding:6px 10px;border:1px solid var(--bor);border-radius:var(--rs);font-size:12px;font-family:'DM Sans',sans-serif;background:var(--sur);color:var(--tx);width:160px}
+.user-row input:focus{outline:none;border-color:var(--brand)}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--brand);color:#fff;padding:10px 20px;border-radius:var(--r-pill);font-size:13px;opacity:0;transition:all .25s;pointer-events:none;z-index:200;white-space:nowrap;box-shadow:var(--shadow)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:32px 16px;color:var(--tx3);font-size:13px}
+
+/* ── LOADING ── */
+.loading-overlay{text-align:center;padding:40px 16px;color:var(--tx2);font-size:13px}
+
+/* ── DESKTOP ── */
+@media(min-width:600px){
+  .main{padding:24px}
+  .stats{grid-template-columns:repeat(4,1fr)}
+  .ci-top{flex-wrap:nowrap}
+}
+@media(min-width:768px){
+  .hdr{padding:16px 24px}
+  .ci-idea{margin-top:6px}
+}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- CONFIG BANNER -->
+<div id="config-banner">
+  <div style="flex-shrink:0;margin-top:2px">⚙️</div>
+  <div style="flex:1">
+    <strong>Setup required:</strong> Paste your Google Apps Script Web App URL below to connect live data.
+    <div class="cfg-row" style="margin-top:8px">
+      <input type="text" id="script-url-input" placeholder="https://script.google.com/macros/s/YOUR_ID/exec" />
+      <button onclick="saveScriptUrl()">Connect</button>
+    </div>
+    <div style="margin-top:5px;font-size:11px;opacity:.7">Don't have the URL yet? Follow the setup guide below the dashboard.</div>
+  </div>
+  <button onclick="dismissBanner()" style="background:transparent;border:none;color:#92400e;font-size:18px;padding:0;flex-shrink:0">×</button>
+</div>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-left">
+    <div class="logo">GC</div>
+    <div>
+      <h1 class="syne">Grace Chemicals <span>Planner</span></h1>
+      <div class="hdr-sub">Social media content tracker</div>
+    </div>
+  </div>
+  <div class="week-nav">
+    <button onclick="changeWeek(-1)">&#8592;</button>
+    <span class="wlabel" id="wlabel"></span>
+    <button onclick="changeWeek(1)">&#8594;</button>
+    <button class="tbtn" onclick="goToday()">Today</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- USER NAME -->
+  <div class="user-row">
+    <label>Your name:</label>
+    <input type="text" id="username" placeholder="e.g. Hanzla" value="" oninput="saveUser()" />
+  </div>
+
+  <!-- SYNC STATUS -->
+  <div class="sync-row">
+    <div class="sync-dot" id="syncDot"></div>
+    <span id="syncMsg">Not connected — enter script URL above</span>
+    <button onclick="loadFromSheet()" style="margin-left:auto;background:transparent;border:1px solid var(--bor);border-radius:6px;padding:4px 10px;font-size:11px;color:var(--tx2)">&#8635; Refresh</button>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats" id="statsRow"></div>
+
+  <!-- PLATFORM FILTER -->
+  <div class="pfilt" id="pfilt"></div>
+
+  <!-- DAY STRIP -->
+  <div class="day-strip-wrap">
+    <div class="sec-label">Weekly overview — tap a day</div>
+    <div class="day-strip" id="dayStrip"></div>
+  </div>
+
+  <!-- DETAIL -->
+  <div class="det-hdr">
+    <div class="det-title syne" id="detTitle">Today's posts</div>
+    <div class="prog-wrap">
+      <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+      <div class="prog-txt" id="progTxt">0 / 0</div>
+    </div>
+  </div>
+  <div class="legend">
+    <div class="leg"><div class="leg-d" style="background:var(--brand2)"></div>Done</div>
+    <div class="leg"><div class="leg-d" style="background:var(--accent2)"></div>Missed</div>
+    <div class="leg"><div class="leg-d" style="background:var(--bor2)"></div>Pending</div>
+  </div>
+  <div class="clist" id="clist"></div>
+
+</div>
+
+<script>
+// ── PLATFORMS ──
+const PLATS = [
+  {id:'fb', name:'Facebook',  color:'#1877F2', bg:'#e7f0fd'},
+  {id:'ig', name:'Instagram', color:'#E1306C', bg:'#fce4ec'},
+  {id:'li', name:'LinkedIn',  color:'#0A66C2', bg:'#e3f0fb'},
+  {id:'yt', name:'YouTube',   color:'#FF0000', bg:'#fde8e8'},
+  {id:'tk', name:'TikTok',    color:'#555555', bg:'#ebebeb'},
+  {id:'wa', name:'WhatsApp',  color:'#25D366', bg:'#e2f8ea'},
+];
+const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+// ── STATE ──
+let PLAN = [];
+let statuses = {};
+let weekOffset = 0;
+let selDay = null;
+let activeFilter = 'all';
+let scriptUrl = '';
+let syncing = false;
+
+// ── STORAGE ──
+const LS = {
+  get: k => { try { return JSON.parse(localStorage.getItem(k)); } catch(e) { return null; } },
+  set: (k,v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) {} }
+};
+
+function init() {
+  scriptUrl = LS.get('gc_script_url') || 'https://script.google.com/macros/s/AKfycbwjecNjxv_1w_CX6astC3rCxgFrviJMIbhC4ISLmort_d5tSCe8SG18CFbn7zr7ak95/exec';
+  statuses = LS.get('gc_statuses') || {};
+  const user = LS.get('gc_user') || '';
+  document.getElementById('username').value = user;
+  PLAN = getDefaultPlan();
+
+  if (scriptUrl) {
+    document.getElementById('config-banner').classList.add('hidden');
+    document.getElementById('script-url-input').value = scriptUrl;
+    loadFromSheet();
+  }
+  const today = new Date().getDay();
+  selDay = today === 0 ? 6 : today - 1;
+  renderAll();
+}
+
+function saveUser() {
+  LS.set('gc_user', document.getElementById('username').value);
+}
+
+function saveScriptUrl() {
+  const url = document.getElementById('script-url-input').value.trim();
+  if (!url.includes('script.google.com')) { showToast('Invalid URL — check again'); return; }
+  scriptUrl = url;
+  LS.set('gc_script_url', url);
+  document.getElementById('config-banner').classList.add('hidden');
+  loadFromSheet();
+}
+
+function dismissBanner() {
+  document.getElementById('config-banner').classList.add('hidden');
+}
+
+// ── SHEET SYNC ──
+function setSyncState(state, msg) {
+  const dot = document.getElementById('syncDot');
+  const txt = document.getElementById('syncMsg');
+  dot.className = 'sync-dot ' + state;
+  txt.textContent = msg;
+}
+
+async function loadFromSheet() {
+  if (!scriptUrl) { setSyncState('err', 'Not connected — enter script URL above'); return; }
+  setSyncState('loading', 'Syncing with Google Sheets...');
+  try {
+    const [planRes, statusRes] = await Promise.all([
+      fetch(scriptUrl + '?action=getPlan'),
+      fetch(scriptUrl + '?action=getStatuses')
+    ]);
+    const planData = await planRes.json();
+    const statusData = await statusRes.json();
+    if (planData.ok && planData.plan.length > 0) {
+      PLAN = planData.plan.map(r => ({
+        dayIndex: Number(r.dayIndex),
+        pid: r.platform,
+        title: r.title,
+        type: r.type,
+        idea: r.idea
+      }));
+    }
+    if (statusData.ok) {
+      statuses = statusData.statuses || {};
+      LS.set('gc_statuses', statuses);
+    }
+    const now = new Date().toLocaleTimeString('en-PK', {hour:'2-digit',minute:'2-digit'});
+    setSyncState('ok', 'Synced with Google Sheets · ' + now);
+    renderAll();
+  } catch(e) {
+    setSyncState('err', 'Sync failed — check script URL or network');
+  }
+}
+
+async function pushStatus(key, status) {
+  if (!scriptUrl) return;
+  const user = document.getElementById('username').value || 'anonymous';
+  try {
+    await fetch(scriptUrl, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'setStatus', key, status, user })
+    });
+  } catch(e) { /* silent fail — local state already saved */ }
+}
+
+async function pushNote(key, note) {
+  if (!scriptUrl) return;
+  try {
+    await fetch(scriptUrl, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'setNote', key, note })
+    });
+  } catch(e) {}
+}
+
+// ── KEY ──
+function stKey(wo, di, pi) { return `${wo}_${di}_${pi}`; }
+function getStatus(wo, di, pi) {
+  const k = stKey(wo, di, pi);
+  return (statuses[k] || {}).status || 'pending';
+}
+function getNote(wo, di, pi) {
+  const k = stKey(wo, di, pi);
+  return (statuses[k] || {}).note || '';
+}
+
+function setStatus(wo, di, pi, status) {
+  const k = stKey(wo, di, pi);
+  statuses[k] = { ...(statuses[k] || {}), status };
+  LS.set('gc_statuses', statuses);
+  pushStatus(k, status);
+  renderAll();
+  const msg = status === 'done' ? '✓ Marked as done' : status === 'missed' ? '✕ Marked as missed' : 'Reset to pending';
+  showToast(msg);
+}
+
+function saveNote(wo, di, pi, note) {
+  const k = stKey(wo, di, pi);
+  statuses[k] = { ...(statuses[k] || {}), note };
+  LS.set('gc_statuses', statuses);
+  pushNote(k, note);
+}
+
+// ── HELPERS ──
+function plt(pid) { return PLATS.find(p => p.id === pid) || PLATS[0]; }
+
+function getWeekDates(offset) {
+  const today = new Date();
+  const dow = today.getDay();
+  const mon = new Date(today);
+  mon.setDate(today.getDate() - (dow === 0 ? 6 : dow - 1) + offset * 7);
+  return Array.from({length: 7}, (_, i) => {
+    const d = new Date(mon); d.setDate(mon.getDate() + i); return d;
+  });
+}
+function fmt(d) { return d.toLocaleDateString('en-PK', {month:'short', day:'numeric'}); }
+function isToday(d) { return d.toDateString() === new Date().toDateString(); }
+function dayPosts(di) { return PLAN.filter(p => p.dayIndex === di); }
+
+// ── RENDER ──
+function renderAll() {
+  renderStats();
+  renderFilter();
+  renderStrip();
+  renderDetail();
+}
+
+function renderStats() {
+  const dates = getWeekDates(weekOffset);
+  let total = 0, done = 0, missed = 0;
+  dates.forEach((_, di) => {
+    dayPosts(di).forEach((_, pi) => {
+      total++;
+      const s = getStatus(weekOffset, di, pi);
+      if (s === 'done') done++;
+      if (s === 'missed') missed++;
+    });
+  });
+  const pending = total - done - missed;
+  const rate = total ? Math.round(done / total * 100) : 0;
+  document.getElementById('statsRow').innerHTML = `
+    <div class="sc s-done">
+      <div class="sc-label">Done</div>
+      <div class="sc-val">${done}</div>
+      <div class="sc-bar"><div class="sc-bar-fill" style="width:${total?Math.round(done/total*100):0}%"></div></div>
+    </div>
+    <div class="sc s-miss">
+      <div class="sc-label">Missed</div>
+      <div class="sc-val">${missed}</div>
+      <div class="sc-bar"><div class="sc-bar-fill" style="width:${total?Math.round(missed/total*100):0}%"></div></div>
+    </div>
+    <div class="sc s-pend">
+      <div class="sc-label">Pending</div>
+      <div class="sc-val">${pending}</div>
+    </div>
+    <div class="sc s-rate">
+      <div class="sc-label">Completion</div>
+      <div class="sc-val">${rate}%</div>
+    </div>`;
+}
+
+function renderFilter() {
+  const all = `<button class="ptab${activeFilter==='all'?' active':''}" onclick="setFilter('all')">All</button>`;
+  const tabs = PLATS.map(p => `
+    <button class="ptab${activeFilter===p.id?' active':''}" onclick="setFilter('${p.id}')">
+      <span class="pd" style="background:${p.color}"></span>${p.name}
+    </button>`).join('');
+  document.getElementById('pfilt').innerHTML = all + tabs;
+}
+
+function renderStrip() {
+  const dates = getWeekDates(weekOffset);
+  document.getElementById('wlabel').textContent = `${fmt(dates[0])} – ${fmt(dates[6])}`;
+  document.getElementById('dayStrip').innerHTML = dates.map((d, di) => {
+    const posts = dayPosts(di).filter(p => activeFilter === 'all' || p.pid === activeFilter);
+    const dots = posts.map((p, pi) => {
+      const origPi = dayPosts(di).indexOf(p);
+      const st = getStatus(weekOffset, di, origPi);
+      return `<div class="ds-dot ${st}" style="background:${plt(p.pid).color};opacity:${st==='done'?.4:st==='missed'?1:.65}"></div>`;
+    }).join('');
+    const selClass = selDay === di ? 'sel' : '';
+    const todayClass = isToday(d) ? 'today' : '';
+    return `<div class="ds-day ${selClass} ${todayClass}" onclick="selectDay(${di})">
+      <div class="ds-dow">${DAYS[di]}</div>
+      <div class="ds-date">${d.getDate()}</div>
+      <div class="ds-dots">${dots || '<div style="width:14px;height:3px;background:var(--bor);border-radius:2px;opacity:.4"></div>'}</div>
+    </div>`;
+  }).join('');
+}
+
+function selectDay(di) {
+  selDay = di;
+  renderStrip();
+  renderDetail();
+}
+
+function renderDetail() {
+  const dates = getWeekDates(weekOffset);
+  const di = selDay !== null ? selDay : (new Date().getDay() === 0 ? 6 : new Date().getDay() - 1);
+  const d = dates[di];
+  document.getElementById('detTitle').textContent = `${DAYS[di]}, ${fmt(d)}`;
+
+  const allPosts = dayPosts(di);
+  const posts = allPosts.filter(p => activeFilter === 'all' || p.pid === activeFilter);
+  let done = 0;
+  allPosts.forEach((_, pi) => { if (getStatus(weekOffset, di, pi) === 'done') done++; });
+  const pct = allPosts.length ? Math.round(done / allPosts.length * 100) : 0;
+  document.getElementById('progFill').style.width = pct + '%';
+  document.getElementById('progTxt').textContent = `${done} / ${allPosts.length} done`;
+
+  if (!posts.length) {
+    document.getElementById('clist').innerHTML = `<div class="empty">No posts for this platform today.</div>`;
+    return;
+  }
+
+  document.getElementById('clist').innerHTML = posts.map(p => {
+    const origPi = allPosts.indexOf(p);
+    const pl = plt(p.pid);
+    const st = getStatus(weekOffset, di, origPi);
+    const note = getNote(weekOffset, di, origPi);
+    const doneClass = st === 'done' ? 'done' : st === 'missed' ? 'missed' : '';
+    const badge = st === 'done'
+      ? `<span class="status-badge sb-done">✓ Done</span>`
+      : st === 'missed'
+      ? `<span class="status-badge sb-miss">✕ Missed</span>`
+      : `<span class="status-badge sb-pend">· Pending</span>`;
+    const actions = st === 'pending'
+      ? `<button class="btn-done" onclick="setStatus(${weekOffset},${di},${origPi},'done')">✓ Done</button>
+         <button class="btn-miss" onclick="setStatus(${weekOffset},${di},${origPi},'missed')">✕ Missed</button>`
+      : `<button class="btn-undo" onclick="setStatus(${weekOffset},${di},${origPi},'pending')">↩ Undo</button>`;
+    return `<div class="ci ${doneClass}">
+      <div class="ci-top">
+        <div class="ci-icon" style="background:${pl.bg};color:${pl.color}">${pl.id.toUpperCase()}</div>
+        <div class="ci-body">
+          ${badge}
+          <div class="ci-pname" style="color:${pl.color}">${pl.name}</div>
+          <div class="ci-title">${p.title}</div>
+          <div class="ci-type">${p.type}</div>
+          <div class="ci-idea"><b>Idea:</b> ${p.idea}</div>
+          <div class="notes-wrap">
+            <textarea class="notes-input" rows="1" placeholder="Caption, link, or notes..."
+              oninput="saveNote(${weekOffset},${di},${origPi},this.value)"
+            >${note}</textarea>
+          </div>
+        </div>
+      </div>
+      <div class="ci-actions">${actions}</div>
+    </div>`;
+  }).join('');
+}
+
+function setFilter(f) { activeFilter = f; renderAll(); }
+function changeWeek(d) { weekOffset += d; selDay = null; renderAll(); }
+function goToday() { weekOffset = 0; selDay = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1; renderAll(); }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ── DEFAULT PLAN ──
+function getDefaultPlan() {
+  return [
+    {dayIndex:0,pid:'fb',title:'Project showcase',type:'Photo post',idea:'Completed waterproofing project — before & after photos'},
+    {dayIndex:0,pid:'ig',title:'Before & after reel',type:'Reel 30s',idea:'Basement waterproofing transformation'},
+    {dayIndex:0,pid:'yt',title:'Roof warning signs',type:'YouTube Short',idea:'3 signs your roof needs waterproofing'},
+    {dayIndex:1,pid:'li',title:'Industry insight',type:'Long-form article',idea:'Why waterproofing fails in Pakistan monsoon season'},
+    {dayIndex:1,pid:'fb',title:'Product spotlight',type:'Image post',idea:'AQUAFIN-2K/M — what it does and where to use it'},
+    {dayIndex:1,pid:'tk',title:'Quick tips video',type:'TikTok 15-30s',idea:'Common roof leakage causes — fast cuts'},
+    {dayIndex:1,pid:'wa',title:'Monday tip',type:'WhatsApp status',idea:'Check expansion joints before monsoon season'},
+    {dayIndex:2,pid:'ig',title:'5 waterproofing systems',type:'Carousel 5 slides',idea:'Roof, basement, bathroom, tank systems — swipe to explore'},
+    {dayIndex:2,pid:'yt',title:'How to apply AQUAFIN-1K',type:'YouTube Short',idea:'Step-by-step roof application 45-60 seconds'},
+    {dayIndex:2,pid:'fb',title:'Client testimonial',type:'Graphic + caption',idea:'Quote from satisfied Lahore client with project photo'},
+    {dayIndex:3,pid:'li',title:'Schomburg system guide',type:'PDF document post',idea:'Technical guide — which product for which application'},
+    {dayIndex:3,pid:'tk',title:'Behind the scenes',type:'TikTok 30-60s',idea:'Site visit footage — application in progress'},
+    {dayIndex:3,pid:'ig',title:'Construction quote',type:'Static graphic',idea:'Industry quote with Grace Chemicals branding'},
+    {dayIndex:3,pid:'wa',title:'Mid-week update',type:'WhatsApp status',idea:'Our team at work — project update photo'},
+    {dayIndex:4,pid:'fb',title:'FAQ — summer waterproofing',type:'Image + text',idea:'Can waterproofing be done in summer heat? Yes — here is how'},
+    {dayIndex:4,pid:'ig',title:'Team post',type:'Photo',idea:'Grace Chemicals team at a project site'},
+    {dayIndex:4,pid:'yt',title:'What is AQUAFIN-IC?',type:'YouTube Short',idea:'Crystalline waterproofing explained in 60 seconds'},
+    {dayIndex:4,pid:'tk',title:'Satisfying application',type:'TikTok 15s',idea:'Smooth coat application with trending audio'},
+    {dayIndex:5,pid:'li',title:'Weekly lesson',type:'Text post',idea:'Lessons from a structural repair project this week'},
+    {dayIndex:5,pid:'fb',title:'Weekend inspection offer',type:'Graphic post',idea:'Free site inspection this weekend — CTA with contact'},
+    {dayIndex:5,pid:'ig',title:'Waterproofing vs damp-proofing',type:'Infographic',idea:'Key differences — designed graphic, educational, shareable'},
+    {dayIndex:5,pid:'wa',title:'Weekend offer broadcast',type:'WhatsApp broadcast',idea:'Free inspection offer — send to all saved contacts'},
+    {dayIndex:6,pid:'ig',title:'Project timelapse reel',type:'Reel 30-60s',idea:'Timelapse of completed waterproofing project'},
+    {dayIndex:6,pid:'yt',title:'This week highlights',type:'YouTube Short',idea:'Weekly highlights — projects, team, products'},
+    {dayIndex:6,pid:'fb',title:'Community poll',type:'Engagement post',idea:'Poll: Which waterproofing problem do you face most?'},
+    {dayIndex:6,pid:'tk',title:'Weekly round-up',type:'TikTok',idea:'Best moments from the week — stitched short clips'},
+  ];
+}
+
+init();
+</script>
+
+<!-- SETUP GUIDE -->
+<div style="background:#fff;border-top:1px solid #e2ddd6;padding:24px 16px;max-width:960px;margin:0 auto;font-size:13px;color:#5a574f;line-height:1.7">
+  <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:600;color:#1a1916;margin-bottom:14px">Setup guide — connect Google Sheets (5 minutes)</div>
+  <ol style="padding-left:18px;display:flex;flex-direction:column;gap:8px">
+    <li>Go to <strong>sheets.google.com</strong> and create a new Google Sheet. Name it <em>Grace Chemicals Social Planner</em>.</li>
+    <li>Click <strong>Extensions → Apps Script</strong>. Delete any default code.</li>
+    <li>Paste the entire contents of <strong>grace-planner-apps-script.gs</strong> (the other file provided) into the editor. Click Save (Ctrl+S).</li>
+    <li>Click <strong>Deploy → New deployment</strong>. Choose type: <em>Web app</em>.</li>
+    <li>Set <em>Execute as:</em> <strong>Me</strong>. Set <em>Who has access:</em> <strong>Anyone</strong>. Click Deploy.</li>
+    <li>Copy the <strong>Web app URL</strong> (looks like: https://script.google.com/macros/s/ABC.../exec).</li>
+    <li>Paste that URL into the setup box at the top of this dashboard and click <strong>Connect</strong>.</li>
+    <li>The dashboard will auto-create two sheets: <em>Planner</em> (edit content plan here) and <em>Status</em> (auto-updated by buttons).</li>
+  </ol>
+  <div style="margin-top:14px;padding:10px 14px;background:#f0f7f2;border-radius:8px;border-left:3px solid #2d6a4f;font-size:12px;color:#1b4332">
+    <strong>Tip:</strong> Each team member opens this page in their browser and enters their name. When they click Done or Missed, it saves to the shared Google Sheet instantly — visible to everyone.
+  </div>
+</div>
+
+</body>
+</html>
